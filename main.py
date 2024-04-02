@@ -3,43 +3,12 @@ import re
 
 
 def strings_from_bpmn(bpmn_path: str) -> list[str]:
-    raw_lines: list[str] = []
+    string_list: list[str] = []
 
     with open(bpmn_path, "r", encoding="utf-8") as file:
-        raw_lines = file.readlines()
+        string_list = file.readlines()
 
-    return raw_lines
-
-
-def matches_strings(lines: list[str]) -> list[str]:
-    pattern = r"name=\"((\d{1,2})\.?(\d{1,2})?\.?(\d{1,2})?)"
-
-    matches: list[str] = []
-    for line in lines:
-        match: re.Match[str] | None = re.search(pattern, line)
-        if match:
-            matches.append(match.string)
-
-    return matches
-
-
-def sort_string_list(bpmn_path: str) -> list[str]:
-    raw_lines = strings_from_bpmn(bpmn_path)
-
-    raw_pattern = r"name=\"((\d{1,2})\.?(\d{1,2})?\.?(\d{1,2})?)"
-
-    raw_matches: list[re.Match] = []
-    for line in raw_lines:
-        match: re.Match[str] | None = re.search(raw_pattern, line)
-        if match:
-            # raw_matches.append(match.group(0))
-            raw_matches.append(match)
-
-    # Можно убрать
-    sorted_matches: list[re.Match] = sorted(raw_matches, key=lambda x: int(x.group(2)))
-    sorted_strings: list[str] = []
-    [sorted_strings.append(string.group(0)) for string in sorted_matches]
-    return sorted_strings
+    return string_list
 
 
 def choose_pattern(template: re.Match) -> str:
@@ -48,11 +17,11 @@ def choose_pattern(template: re.Match) -> str:
     last_number: str = template.group(4)
 
     if last_number:
-        return r"(" + first_number + r"\." + second_number + r"\.?(\d{1,2})?)"
+        return r"name=\"(" + first_number + r"\." + second_number + r"\.?(\d{1,2})?)"
     elif second_number:
-        return r"[^\.](" + first_number + r"\.?(\d{1,2})?)"
+        return r"name=\"(" + first_number + r"\.?(\d{1,2})?)"
     else:
-        return r"[^\.]((" + first_number + r")\.)"
+        return r"name=\"((" + first_number + r")\.)"
 
 
 def choose_replacment_str(template: re.Match, match: re.Match) -> str:
@@ -87,11 +56,13 @@ def retry_or_continue(template: re.Match, match: re.Match) -> bool:
     return False
 
 
-def incriment_strings(sorted_string: list[str], template: re.Match) -> None:
+def incriment_strings(string_list: list[str], template: re.Match) -> None:
+    # Full string => 4.1.2
+    # 0-> 4.1.2 | 1-> 4.1.2 | 2-> 4 | 3-> 1 | 4-> 2
     pattern: str = choose_pattern(template)
 
-    for i in range(len(sorted_string)):
-        match: re.Match | None = re.search(pattern, sorted_string[i])
+    for i in range(len(string_list)):
+        match: re.Match | None = re.search(pattern, string_list[i])
         if match is None:
             continue
         if retry_or_continue(template, match):
@@ -99,44 +70,44 @@ def incriment_strings(sorted_string: list[str], template: re.Match) -> None:
 
         replacment_str: str = choose_replacment_str(template, match)
 
-        sorted_string[i] = sorted_string[i].replace(
+        string_list[i] = string_list[i].replace(
             f'name="{match.group(1)}',
             replacment_str,
         )
 
 
-def create_new_bpmn(bpmn_path: str, incremented_strings: list[str]) -> None:
-    folder_path = os.path.dirname(bpmn_path)
-    file_name = os.path.join(folder_path, "new.bpmn")
-    with open(file_name, "w") as file:
-        file.writelines(incremented_strings)
+def validate_input(input_str: str) -> re.Match:
+    pattern = r"((\d{1,2})\.(\d{1,2})?\.?(\d{1,2})?)"
+
+    match: re.Match[str] | None = re.search(pattern, input_str)
+
+    if match is None:
+        raise Exception(
+            "Ваше значение не подходит шаблону!\nВведите корректные даные. Например 5. или 5.1 или 4.2.5 "
+        )
+
+    return match
+
+
+def create_new_bpmn(bpmn_path: str) -> str:
+    folder_path: str = os.path.dirname(bpmn_path)
+    file_path: str = os.path.join(folder_path, "new.bpmn")
+    return file_path
+
+
+def rewrite_new_bpmn(new_bpmn_path: str, raw_strings: list[str]) -> None:
+    with open(new_bpmn_path, "w") as file:
+        file.writelines(raw_strings)
 
 
 if __name__ == "__main__":
-    bpmn_path = (
-        "G:\\BPNM_UPDATE\\diagram.bpmn"  # input("Введите путь до файла bpmn:\n")
-    )
-    raw_lines: list[str] = strings_from_bpmn(bpmn_path)
-    matches: list[str] = matches_strings(raw_lines)
-    # sorted_string: list[str] = sort_string_list(bpmn_path)
+    bpmn_path: str = input("Введите путь до файла bpmn:\n")
+    string_list: list[str] = strings_from_bpmn(bpmn_path)
 
-    start_point: str = (
-        "5."  # input("С какого пункта начать? Например 5. или 5.1 или 4.2.5\n")
-    )
-    pattern = r"((\d{1,2})\.(\d{1,2})?\.?(\d{1,2})?)"
+    input_str: str = input("С какого пункта начать? Например 5. или 5.1 или 4.2.5\n")
 
-    template: re.Match[str] | None = re.search(pattern, start_point)
+    match: re.Match[str] = validate_input(input_str)
 
-    if template is None:
-        raise Exception("Кал")
-
-    # Full string => 4.1.2
-    # 0-> 4.1.2 | 1-> 4.1.2 | 2-> 4 | 3-> 1 | 4-> 2
-    incriment_strings(matches, template)
-
-    # TODO -> КАК ТО НАУЧИТСЯ ЗАМЕНЯТЬ СТРОКИ
-
-    # for replaced_str in matches:
-    #     for line in raw_lines:
-
-    create_new_bpmn(bpmn_path, matches)
+    incriment_strings(string_list, match)
+    new_file_path: str = create_new_bpmn(bpmn_path)
+    rewrite_new_bpmn(new_file_path, string_list)
