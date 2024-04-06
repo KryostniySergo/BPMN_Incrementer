@@ -1,0 +1,7 @@
+G:\BPNM_UPDATE\BPMN_Incrementer\bin\Release\BPMN_Incrementer.exe.config
+G:\BPNM_UPDATE\BPMN_Incrementer\bin\Release\BPMN_Incrementer.exe
+G:\BPNM_UPDATE\BPMN_Incrementer\bin\Release\BPMN_Incrementer.pdb
+G:\BPNM_UPDATE\BPMN_Incrementer\obj\Release\BPMN_Incrementer.csproj.AssemblyReference.cache
+G:\BPNM_UPDATE\BPMN_Incrementer\obj\Release\BPMN_Incrementer.csproj.CoreCompileInputs.cache
+G:\BPNM_UPDATE\BPMN_Incrementer\obj\Release\BPMN_Incrementer.exe
+G:\BPNM_UPDATE\BPMN_Incrementer\obj\Release\BPMN_Incrementer.pdb
