@@ -51,7 +51,7 @@ public class BPMN_Incrimenter
         {
             return true;
         }
-        else if (!string.IsNullOrEmpty(secondNumber) && int.Parse(secondNumber) > int.Parse(match.Groups[2].Value))
+        else if (string.IsNullOrEmpty(lastNumber) && !string.IsNullOrEmpty(secondNumber) && int.Parse(secondNumber) > int.Parse(match.Groups[2].Value))
         {
             return true;
         }
