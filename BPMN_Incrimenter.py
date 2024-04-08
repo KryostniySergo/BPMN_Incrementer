@@ -32,7 +32,7 @@ class BPMN_Incrimenter:
     def __retry_or_continue(self, match: re.Match) -> bool:
         if self.last_number and int(self.last_number) > int(match.group(2)):
             return True
-        elif self.second_number and int(self.second_number) > int(match.group(2)):
+        elif not self.last_number and self.second_number and int(self.second_number) > int(match.group(2)):
             return True
         elif (
             not self.last_number
