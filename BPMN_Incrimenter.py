@@ -32,7 +32,11 @@ class BPMN_Incrimenter:
     def __retry_or_continue(self, match: re.Match) -> bool:
         if self.last_number and int(self.last_number) > int(match.group(2)):
             return True
-        elif not self.last_number and self.second_number and int(self.second_number) > int(match.group(2)):
+        elif (
+            not self.last_number
+            and self.second_number
+            and int(self.second_number) > int(match.group(2))
+        ):
             return True
         elif (
             not self.last_number
@@ -61,3 +65,6 @@ class BPMN_Incrimenter:
                 f'name="{match.group(1)}',
                 replacment_str,
             )
+
+    def increment_range(self, string_list: list[str]) -> None:
+        raise NotImplementedError()
