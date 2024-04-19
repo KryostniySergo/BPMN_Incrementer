@@ -10,28 +10,22 @@ from utils.validate_input import validate_input
 def do_one() -> None:
     user_input: str = input("С какого пункта начать? Например 5. или 5.1 или 4.2.5\n")
     match: re.Match[str] = validate_input(user_input)
-    incrimenter = BPMN_Incrimenter(match)
-    incrimenter.incriment_strings(string_list)
+    BPMN_Incrimenter(match).incriment_strings(string_list)
     new_file_path: str = create_new_bpmn(bpmn_path)
     rewrite_new_bpmn(new_file_path, string_list)
 
 
-def do_range():
-    pattern = r"(\d{1,2})(\.\d{1,2})?(\.?\d{1,2})?"
-    first_input: str = input("С какого пункта начать? Например 5. или 5.1 или 4.2.5\n")
-    first_match: re.Match[str] = validate_input(first_input)
-    second_input: str = input("До кокого пункта? Например 5. или 5.1 или 4.2.5\n")
-    second_match: re.Match[str] = validate_input(second_input)
-    start = int(first_match.group(2))
-    end = int(second_match.group(2))
-    while start < end:
-        new_str: str = re.sub(pattern, str(start) + r"\2\3", first_input)
-        match: re.Match[str] = validate_input(new_str)
-        incrimenter = BPMN_Incrimenter(match)
-        incrimenter.incriment_strings(string_list)
-        new_file_path: str = create_new_bpmn(bpmn_path)
-        rewrite_new_bpmn(new_file_path, string_list)
-        start += 1
+def do_range() -> None:
+    start = int(input("С какого пункта начать? Например 5 или 8\n"))
+    end = int(input("До кокого пункта? Например 5 или 8\n"))
+
+    while end >= start:
+        match: re.Match[str] = validate_input(f"{end}.")
+        BPMN_Incrimenter(match).incriment_strings(string_list)
+        end -= 1
+
+    new_file_path: str = create_new_bpmn(bpmn_path)
+    rewrite_new_bpmn(new_file_path, string_list)
 
 
 if __name__ == "__main__":
