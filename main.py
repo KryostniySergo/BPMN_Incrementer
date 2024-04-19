@@ -7,7 +7,7 @@ from utils.rewrite_new_bpmn import rewrite_new_bpmn
 from utils.validate_input import validate_input
 
 
-def do_one() -> None:
+def do_one(bpmn_path: str, string_list: list[str]) -> None:
     user_input: str = input("С какого пункта начать? Например 5. или 5.1 или 4.2.5\n")
     match: re.Match[str] = validate_input(user_input)
     BPMN_Incrimenter(match).incriment_strings(string_list)
@@ -15,7 +15,7 @@ def do_one() -> None:
     rewrite_new_bpmn(new_file_path, string_list)
 
 
-def do_range() -> None:
+def do_range(bpmn_path: str, string_list: list[str]) -> None:
     start = int(input("С какого пункта начать? Например 5 или 8\n"))
     end = int(input("До кокого пункта? Например 5 или 8\n"))
 
@@ -28,12 +28,16 @@ def do_range() -> None:
     rewrite_new_bpmn(new_file_path, string_list)
 
 
-if __name__ == "__main__":
+def main() -> None:
     bpmn_path: str = input("Введите путь до файла bpmn:\n")
     string_list: list[str] = get_strings_from_bpmn(bpmn_path)
 
     match input("Как вы хотите обработать bpmn? 1: Определенный пункт 2: Диапозон\n"):
         case "1":
-            do_one()
+            do_one(bpmn_path, string_list)
         case "2":
-            do_range()
+            do_range(bpmn_path, string_list)
+
+
+if __name__ == "__main__":
+    main()
